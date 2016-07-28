@@ -42,7 +42,7 @@ class Question < ActiveRecord::Base
     choices_with_count = self
       .answer_choices
       .select("answer_choices.*, COUNT(responses.id) AS num_responses")
-      .joins(" LEFT OUTER JOIN responses ON responses.answer_choice_id = answer_choices.id")
+      .joins("LEFT OUTER JOIN responses ON responses.answer_choice_id = answer_choices.id")
       .where(question_id: self.id)
       .group("answer_choices.id")
 

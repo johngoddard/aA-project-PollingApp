@@ -18,11 +18,19 @@ class Response < ActiveRecord::Base
 
   def sibling_responses
     self.question.responses.where.not(id: self.id)
+
+    Question.joins(answer_choices: [:responses])
+             .where('answer_choices.id' => self.answer_choice_id,
+                    'responses.user_id' => self.user_id)
   end
 
   def respondent_already_answered?
     # sibling_responses.any?{|response| response.user_id == self.user_id}
-    sibling_responses.where(user_id: self.user_id).length > 0
+    # sibling_responses.where(user_id: self.user_id).length > 0
+    AnswerChoice.joins(:responses)
+             .where('answer_choices.id' => self.answer_choice_id,
+                    'responses.user_id' => self.user_id)
+            .length > 0
   end
 
   def not_duplicate_response
@@ -32,7 +40,10 @@ class Response < ActiveRecord::Base
   end
 
   def get_poll_author_id
-    self.answer_choice.question.poll.author_id
+    Poll.joins(questions: [:answer_choices])
+        .where('answer_choices.id' => self.answer_choice_id)
+        .first
+        .author_id
   end
 
   def not_poll_author
