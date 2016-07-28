@@ -19,7 +19,7 @@ class Response < ActiveRecord::Base
   def sibling_responses
     self.question.responses.where.not(id: self.id)
 
-    Question.joins(answer_choices: [:responses])
+    Question.joins(answer_choices: responses: :users)
              .where('answer_choices.id' => self.answer_choice_id,
                     'responses.user_id' => self.user_id)
   end

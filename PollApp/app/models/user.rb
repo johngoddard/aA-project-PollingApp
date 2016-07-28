@@ -16,9 +16,7 @@ class User < ActiveRecord::Base
 
   def completed_polls
 
-    Poll.all
-        .joins("LEFT OUTER JOIN questions ON questions.poll_id = polls.id")
-        .joins("LEFT OUTER JOIN answer_choices ON answer_choices.question_id = questions.id")
+    Poll.joins(questions: :answer_choices)
         .joins("LEFT OUTER JOIN (SELECT responses.* FROM responses WHERE user_id = #{self.id}) a on a.answer_choice_id = answer_choices.id")
         .group("polls.id")
         .having("COUNT(DISTINCT(questions.id)) = COUNT(a.id)")
@@ -64,7 +62,7 @@ end
 #     COUNT(DISTINCT q.id) = COUNT(user_r.id)
 # SQL
 #
-# 
+#
 # execute(<<-SQL, self.id)
 #   SELECT
 #     p.*,
